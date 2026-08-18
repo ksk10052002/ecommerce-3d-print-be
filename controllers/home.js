@@ -3,7 +3,7 @@ const home = (req, res) => {
     res.status(200).send("Server is running smoothly on 8000!");
     console.log("/ api hit");
   } catch (e) {
-    print(e);
+    console.log(e);
     res.status(500).send("Server failed");
   }
 };

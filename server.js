@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const router = require("./routes/Routes");
@@ -15,6 +16,13 @@ app.use("/", router);
 app.use("/api/uploads", uploadRoutes)
 app.use("/api", quoteRoutes);
 
-app.listen(8000, () => {
-  console.log("Server is running on 8000");
+app.use("/api/uploads", uploadRoutes)
+app.use("/api", quoteRoutes);
+
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+  console.log(`Server is running on ${PORT}`);
 });
+
+
+// hello i am sai
