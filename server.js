@@ -16,9 +16,6 @@ app.use("/", router);
 app.use("/api/uploads", uploadRoutes)
 app.use("/api", quoteRoutes);
 
-app.use("/api/uploads", uploadRoutes)
-app.use("/api", quoteRoutes);
-
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);
