@@ -1,4 +1,4 @@
-const { appendToSheet } = require("../services/googleSheet");
+const { appendToSheet } = require("../services/contactSheet");
 const contact = async (req, res) => {
   try {
     const { name, email, message } = req.body;
@@ -8,7 +8,7 @@ const contact = async (req, res) => {
       return res.status(400).json({ error: "Missing fields" });
     }
 
-    await appendToSheet({ name, email, message });
+    await appendContactRow({ name, email, message });
 
     res.status(200).json({ message: "success" });
   } catch (e) {
