@@ -104,7 +104,12 @@ router.post("/confirm", async (req, res) => {
             time,
         });
 
-        const pdfPath = await generatePDF(req.body);
+        const pdfPath = await generatePDF({
+            ...req.body,
+            quoteId,
+            date,
+            time
+        });
 
 
         console.log("PDF CREATED:", pdfPath);
