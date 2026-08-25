@@ -54,6 +54,9 @@ const addRow = async (data) => {
   });
 
   const {
+    quoteId,
+    date,
+    time,
     name,
     phone,
     email,
@@ -74,6 +77,9 @@ const addRow = async (data) => {
     valueInputOption: "USER_ENTERED",
     requestBody: {
       values: [[
+        quoteId,
+        date,
+        time,
         name,
         phone,
         email,

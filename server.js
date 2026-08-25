@@ -8,7 +8,7 @@ console.log("Upload routes loaded");
 
 
 const app = express();
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: process.env.ORIGINS.split(",") }));
 app.use(express.json());
 
 app.use("/", router);

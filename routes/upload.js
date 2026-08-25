@@ -19,6 +19,7 @@ const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const r2 = require("../config/r2Client");
 const { v4: uuid } = require("uuid");
 const { addRow } = require("../services/googleSheet");
+const { generateQuoteId } = require("../services/quoteId");
 
 
 // Test Route
@@ -78,10 +79,27 @@ router.post("/confirm", async (req, res) => {
     console.log(req.body);
     try {
 
+        const quoteId = generateQuoteId();
+        console.log("Generated Quote Id:", quoteId);
+
         console.log("Received Quote:");
         console.log(req.body);
 
-        await addRow(req.body);
+        const now = new Date();
+
+        const date = now.toLocaleDateString("en-GB");
+
+        const time = now.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+
+        await addRow({
+            ...req.body,
+            quoteId,
+            date,
+            time,
+        });
 
         // For now just return success.
         // Later we'll save everything to Google Sheets.
