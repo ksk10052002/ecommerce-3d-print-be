@@ -20,6 +20,7 @@ const r2 = require("../config/r2Client");
 const { v4: uuid } = require("uuid");
 const { addRow } = require("../services/googleSheet");
 const { generateQuoteId } = require("../services/quoteId");
+const generatePDF = require("../services/pdfGenerator");
 
 
 // Test Route
@@ -103,12 +104,18 @@ router.post("/confirm", async (req, res) => {
             time,
         });
 
+        const pdfPath = await generatePDF(req.body);
+
+
+        console.log("PDF CREATED:", pdfPath);
+
         // For now just return success.
         // Later we'll save everything to Google Sheets.
 
         res.json({
             success: true,
-            message: "Quote received successfully."
+            message: "Quote received successfully.",
+            pdf: pdfPath
         });
 
     } catch (err) {
