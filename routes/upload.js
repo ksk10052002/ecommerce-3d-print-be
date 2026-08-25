@@ -90,8 +90,10 @@ router.post("/confirm", async (req, res) => {
         const date = now.toLocaleDateString("en-GB");
 
         const time = now.toLocaleTimeString("en-IN", {
+            timeZone: "Asia/Kolkata",
             hour: "2-digit",
             minute: "2-digit",
+            second: "2-digit"
         });
 
         await addRow({
