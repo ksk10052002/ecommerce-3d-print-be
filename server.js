@@ -18,7 +18,7 @@ const app = express();
 const allowedOrigins = process.env.ORIGINS
   ? process.env.ORIGINS.split(",")
   : [];
-
+console.log("Allowed Origins:", process.env.ORIGINS);
 app.use(cors({
   origin: function (origin, callback) {
 
