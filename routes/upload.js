@@ -21,6 +21,7 @@ const { v4: uuid } = require("uuid");
 const { addRow } = require("../services/googleSheet");
 const { generateQuoteId } = require("../services/quoteId");
 const generatePDF = require("../services/pdfGenerator");
+const sendQuoteEmail = require("../services/sendQuoteEmail");
 
 
 // Test Route
@@ -113,6 +114,15 @@ router.post("/confirm", async (req, res) => {
 
 
         console.log("PDF CREATED:", pdfPath);
+
+        await sendQuoteEmail({
+            customerName: req.body.name,
+            customerEmail: req.body.email,
+            quoteId,
+            pdfPath
+        });
+
+        console.log("Customer email sent successfully.");
 
         // For now just return success.
         // Later we'll save everything to Google Sheets.

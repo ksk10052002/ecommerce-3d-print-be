@@ -92,7 +92,8 @@ const generatePDF = (data) => {
 
 
         doc.fontSize(16)
-            .text(`Total Amount : ₹${data.totalPrice || "Calculated Later"}`);
+        .font("Helvetica-Bold")
+        .text(`Total Amount : ₹${data.totalPrice || "Calculated Later"}`);
 
 
         doc.end();
