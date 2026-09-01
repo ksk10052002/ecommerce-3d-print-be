@@ -1,51 +1,26 @@
 const transporter = require("./mailService");
 
-async function sendQuoteEmail({
-    customerName,
-    customerEmail,
-    quoteId,
-    pdfPath
-}) {
+async function sendQuoteEmail(data) {
+    try {
+        const info = await transporter.sendMail({
+            from: `"THREEDITRON" <${process.env.SMTP_USER}>`,
+            to: data.customerEmail,
+            subject: `Your THREEDITRON Quote (${data.quoteId})`,
+            html: `<h2>Hello ${data.customerName}</h2>`,
+            attachments: [
+                {
+                    filename: `${data.quoteId}.pdf`,
+                    path: data.pdfPath
+                }
+            ]
+        });
 
-    await transporter.sendMail({
+        console.log("✅ Email sent:", info.response);
 
-        from: `"THREEDITRON" <${process.env.SMTP_USER}>`,
-
-        to: customerEmail,
-
-        subject: `Your THREEDITRON 3D Printing Quotation (${quoteId})`,
-
-        html: `
-            <h2>Hello ${customerName},</h2>
-
-            <p>Thank you for choosing <b>THREEDITRON</b>.</p>
-
-            <p>Your quotation has been generated successfully.</p>
-
-            <p><strong>Quote ID:</strong> ${quoteId}</p>
-
-            <p>Please find your quotation attached as a PDF.</p>
-
-            <br>
-
-            <p>
-                Regards,<br>
-                <b>THREEDITRON</b><br>
-                3D Printing Solutions
-            </p>
-        `,
-
-        attachments: [
-            {
-                filename: `${quoteId}.pdf`,
-                path: pdfPath
-            }
-        ]
-
-    });
-
-    console.log("✅ Email sent successfully.");
-
+    } catch (err) {
+        console.error("❌ Email Error:", err);
+        throw err;
+    }
 }
 
 module.exports = sendQuoteEmail;
