@@ -1,16 +1,3 @@
-// const express = require("express");
-// const router = express.Router();
-
-// router.get("/test", (req, res) => {
-//     res.json({
-//         success: true,
-//         message: "Upload route is working!"
-//     });
-// });
-
-// module.exports = router;
-
-
 const express = require("express");
 const router = express.Router();
 
@@ -20,129 +7,89 @@ const r2 = require("../config/r2Client");
 const { v4: uuid } = require("uuid");
 const { addRow } = require("../services/googleSheet");
 const { generateQuoteId } = require("../services/quoteId");
-const generatePDF = require("../services/pdfGenerator");
-const sendQuoteEmail = require("../services/sendQuoteEmail");
-
 
 // Test Route
 router.get("/test", (req, res) => {
-    res.json({
-        success: true,
-        message: "Upload route is working!"
-    });
+  res.json({
+    success: true,
+    message: "Upload route is working!",
+  });
 });
 
 // Generate Upload URL
 router.post("/presign", async (req, res) => {
-    try {
+  try {
+    const { fileName, fileType } = req.body;
 
-        const { fileName, fileType } = req.body;
-
-        if (!fileName || !fileType) {
-            return res.status(400).json({
-                success: false,
-                message: "fileName and fileType are required"
-            });
-        }
-
-        const key = `${uuid()}-${fileName}`;
-
-        const command = new PutObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME,
-            Key: key,
-            ContentType: fileType
-        });
-
-        const uploadUrl = await getSignedUrl(r2, command, {
-            expiresIn: 300
-        });
-
-        res.json({
-            success: true,
-            uploadUrl,
-            key
-        });
-
-    } catch (err) {
-
-        console.log(err);
-
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-
+    if (!fileName || !fileType) {
+      return res.status(400).json({
+        success: false,
+        message: "fileName and fileType are required",
+      });
     }
+
+    const key = `${uuid()}-${fileName}`;
+
+    const command = new PutObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: key,
+      ContentType: fileType,
+    });
+
+    const uploadUrl = await getSignedUrl(r2, command, {
+      expiresIn: 300,
+    });
+
+    res.json({
+      success: true,
+      uploadUrl,
+      key,
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
 });
 
-
 router.post("/confirm", async (req, res) => {
-    console.log("========== CONFIRM API HIT ==========");
+  console.log("========== CONFIRM API HIT ==========");
+  console.log(req.body);
+  try {
+    const quoteId = generateQuoteId();
+    console.log("Generated Quote Id:", quoteId);
+
+    console.log("Received Quote:");
     console.log(req.body);
-    try {
 
-        const quoteId = generateQuoteId();
-        console.log("Generated Quote Id:", quoteId);
+    const now = new Date();
 
-        console.log("Received Quote:");
-        console.log(req.body);
+    const date = now.toLocaleDateString("en-GB");
 
-        const now = new Date();
+    const time = now.toLocaleTimeString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
 
-        const date = now.toLocaleDateString("en-GB");
+    await addRow({
+      ...req.body,
+      quoteId,
+      date,
+      time,
+    });
+  } catch (err) {
+    console.log(err);
 
-        const time = now.toLocaleTimeString("en-IN", {
-            timeZone: "Asia/Kolkata",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit"
-        });
-
-        await addRow({
-            ...req.body,
-            quoteId,
-            date,
-            time,
-        });
-
-        const pdfPath = await generatePDF({
-            ...req.body,
-            quoteId,
-            date,
-            time
-        });
-
-
-        console.log("PDF CREATED:", pdfPath);
-
-        await sendQuoteEmail({
-            customerName: req.body.name,
-            customerEmail: req.body.email,
-            quoteId,
-            pdfPath
-        });
-
-        console.log("Customer email sent successfully.");
-
-        // For now just return success.
-        // Later we'll save everything to Google Sheets.
-
-        res.json({
-            success: true,
-            message: "Quote received successfully.",
-            pdf: pdfPath
-        });
-
-    } catch (err) {
-
-        console.log(err);
-
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-
-    }
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
 });
 
 module.exports = router;
