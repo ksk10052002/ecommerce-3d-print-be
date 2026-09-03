@@ -82,6 +82,11 @@ router.post("/confirm", async (req, res) => {
       date,
       time,
     });
+    res.json({
+      success: true,
+      message: "Quote added to Google Sheet",
+      quoteId,
+    });
   } catch (err) {
     console.log(err);
 
